@@ -843,6 +843,7 @@ Runner.prototype = {
       this.distanceMeter.reset(this.highestScore);
       this.horizon.reset();
       this.tRex.reset();
+      this.tRex.laserEnergy = Trex.config.STARTING_LASER_ENERGY;
       this.playSound(this.soundFx.BUTTON_PRESS);
       this.invert(true);
       this.update();
@@ -1571,7 +1572,7 @@ function Trex(canvas, spritePos) {
   this.jumpspotX = 0;
   
   this.isLaserOn = false;
-  this.laserEnergy = 3;
+  this.laserEnergy = Trex.config.STARTING_LASER_ENERGY;
 
   this.init();
 };
@@ -1595,7 +1596,8 @@ Trex.config = {
   START_X_POS: 50,
   WIDTH: 44,
   WIDTH_DUCK: 59,
-  MAX_LASER_ENERGY: 20
+  STARTING_LASER_ENERGY: 2,
+  MAX_LASER_ENERGY: 6
 };
 
 
@@ -1925,7 +1927,6 @@ Trex.prototype = {
     this.midair = false;
     this.speedDrop = false;
     this.jumpCount = 0;
-    this.laserEnergy = 3;
   }
 };
 
