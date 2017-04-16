@@ -304,26 +304,32 @@ Runner.prototype = {
   },
 
   /**
-   * Load and decode base 64 encoded sounds.
+   * Load sounds via XMLHttpRequest and decodes.
    */
   loadSounds: function() {
     if (!IS_IOS) {
       this.audioContext = new AudioContext();
-
+      
       var resourceTemplate =
           document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content;
-
+      
       for (var sound in Runner.sounds) {
         var soundSrc =
             resourceTemplate.getElementById(Runner.sounds[sound]).src;
-        soundSrc = soundSrc.substr(soundSrc.indexOf(',') + 1);
-        var buffer = decodeBase64ToArrayBuffer(soundSrc);
-
-        // Async, so no guarantee of order in array.
-        this.audioContext.decodeAudioData(buffer, function(index, audioData) {
+        
+        var request = new XMLHttpRequest();
+        
+        request.open('GET', soundSrc, true);
+        
+        request.responseType = 'arraybuffer';
+        
+        request.addEventListener('load', function() {
+          var buffer = request.response;
+          
+          this.audioContext.decodeAudioData(buffer, function(index, audioData) {
             this.soundFx[index] = audioData;
           }.bind(this, sound));
-      }
+        });
     }
   },
 
