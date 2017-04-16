@@ -1925,6 +1925,7 @@ Trex.prototype = {
     this.midair = false;
     this.speedDrop = false;
     this.jumpCount = 0;
+    this.laserEnergy = 3;
   }
 };
 
