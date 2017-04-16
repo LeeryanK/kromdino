@@ -1789,9 +1789,9 @@ Trex.prototype = {
     
     // Draws laser energy meter.
     this.canvasCtx.fillStyle = '#585254';
-    this.canvasCtx.fillRect(414, 30, 60, 8);
+    this.canvasCtx.fillRect(534, 30, 60, 8);
     this.canvasCtx.fillStyle = Laser.beam.color;
-    this.canvasCtx.fillRect(414, 30, Math.floor(60 * this.laserEnergy / Trex.config.MAX_LASER_ENERGY), 8);
+    this.canvasCtx.fillRect(534, 30, Math.floor(60 * this.laserEnergy / Trex.config.MAX_LASER_ENERGY), 8);
   },
 
   /**
