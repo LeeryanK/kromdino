@@ -317,6 +317,10 @@ Runner.prototype = {
         var soundSrc =
             resourceTemplate.getElementById(Runner.sounds[sound]).src;
         
+        if (soundSrc.slice(0, 5) !== 'http') {
+          soundSrc = window.location + soundSrc;
+        }
+        
         var request = new XMLHttpRequest();
         
         request.open('GET', soundSrc, true);
@@ -330,6 +334,7 @@ Runner.prototype = {
             this.soundFx[index] = audioData;
           }.bind(this, sound));
         });
+      }
     }
   },
 
