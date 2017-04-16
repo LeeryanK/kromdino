@@ -1258,8 +1258,8 @@ var Laser = {
     color: 'red',
 
     start: {
-      x: 50,
-      y: 100
+      x: 48,
+      y: 99
     },
 
     end: {
