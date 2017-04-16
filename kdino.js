@@ -304,25 +304,36 @@ Runner.prototype = {
   },
 
   /**
-   * Load and decode base 64 encoded sounds.
+   * Load sounds via XMLHttpRequest and decodes.
    */
   loadSounds: function() {
     if (!IS_IOS) {
       this.audioContext = new AudioContext();
-
+      
       var resourceTemplate =
           document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content;
-
+      
       for (var sound in Runner.sounds) {
         var soundSrc =
             resourceTemplate.getElementById(Runner.sounds[sound]).src;
-        soundSrc = soundSrc.substr(soundSrc.indexOf(',') + 1);
-        var buffer = decodeBase64ToArrayBuffer(soundSrc);
-
-        // Async, so no guarantee of order in array.
-        this.audioContext.decodeAudioData(buffer, function(index, audioData) {
+        
+        if (soundSrc.slice(0, 5) !== 'http') {
+          soundSrc = window.location + soundSrc;
+        }
+        
+        var request = new XMLHttpRequest();
+        
+        request.open('GET', soundSrc, true);
+        
+        request.responseType = 'arraybuffer';
+        
+        request.addEventListener('load', function() {
+          var buffer = request.response;
+          
+          this.audioContext.decodeAudioData(buffer, function(index, audioData) {
             this.soundFx[index] = audioData;
           }.bind(this, sound));
+        });
       }
     }
   },
@@ -832,6 +843,7 @@ Runner.prototype = {
       this.distanceMeter.reset(this.highestScore);
       this.horizon.reset();
       this.tRex.reset();
+      this.tRex.laserEnergy = Trex.config.STARTING_LASER_ENERGY;
       this.playSound(this.soundFx.BUTTON_PRESS);
       this.invert(true);
       this.update();
@@ -1247,8 +1259,8 @@ var Laser = {
     color: 'red',
 
     start: {
-      x: 50,
-      y: 98
+      x: 48,
+      y: 99
     },
 
     end: {
@@ -1558,6 +1570,9 @@ function Trex(canvas, spritePos) {
   this.speedDrop = false;
   this.jumpCount = 0;
   this.jumpspotX = 0;
+  
+  this.isLaserOn = false;
+  this.laserEnergy = Trex.config.STARTING_LASER_ENERGY;
 
   this.init();
 };
@@ -1580,7 +1595,9 @@ Trex.config = {
   SPRITE_WIDTH: 262,
   START_X_POS: 50,
   WIDTH: 44,
-  WIDTH_DUCK: 59
+  WIDTH_DUCK: 59,
+  STARTING_LASER_ENERGY: 2,
+  MAX_LASER_ENERGY: 6
 };
 
 
@@ -1771,6 +1788,12 @@ Trex.prototype = {
       this.canvasCtx.stroke();
       this.canvasCtx.closePath();
     }
+    
+    // Draws laser energy meter.
+    this.canvasCtx.fillStyle = '#585254';
+    this.canvasCtx.fillRect(534, 30, 60, 8);
+    this.canvasCtx.fillStyle = Laser.beam.color;
+    this.canvasCtx.fillRect(534, 30, Math.floor(60 * this.laserEnergy / Trex.config.MAX_LASER_ENERGY), 8);
   },
 
   /**
@@ -1871,7 +1894,12 @@ Trex.prototype = {
   },
 
   setLaser: function(isLaserOn) {
-    this.isLaserOn = isLaserOn;
+    if (isLaserOn && this.laserEnergy > 0) {
+      this.isLaserOn = true;
+      this.laserEnergy -= 1;
+    } else {
+      this.isLaserOn = false;
+    }
   },
 
   /**
