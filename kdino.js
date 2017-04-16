@@ -1258,7 +1258,7 @@ var Laser = {
     color: 'red',
 
     start: {
-      x: 50,
+      x: 52,
       y: 98
     },
 
@@ -1569,6 +1569,9 @@ function Trex(canvas, spritePos) {
   this.speedDrop = false;
   this.jumpCount = 0;
   this.jumpspotX = 0;
+  
+  this.isLaserOn = false;
+  this.laserEnergy = 3;
 
   this.init();
 };
@@ -1591,7 +1594,8 @@ Trex.config = {
   SPRITE_WIDTH: 262,
   START_X_POS: 50,
   WIDTH: 44,
-  WIDTH_DUCK: 59
+  WIDTH_DUCK: 59,
+  MAX_LASER_ENERGY: 20
 };
 
 
@@ -1782,6 +1786,12 @@ Trex.prototype = {
       this.canvasCtx.stroke();
       this.canvasCtx.closePath();
     }
+    
+    // Draws laser energy meter.
+    this.canvasCtx.fillStyle = '#585254';
+    this.canvasCtx.fillRect(414, 30, 60, 8);
+    this.canvasCtx.fillStyle = Laser.beam.color;
+    this.canvasCtx.fillRect(414, 30, Math.floor(60 * this.laserEnergy / Trex.config.MAX_LASER_ENERGY), 8);
   },
 
   /**
@@ -1882,7 +1892,12 @@ Trex.prototype = {
   },
 
   setLaser: function(isLaserOn) {
-    this.isLaserOn = isLaserOn;
+    if (isLaserOn && this.laserEnergy > 0) {
+      this.isLaserOn = true;
+      this.laserEnergy -= 1;
+    } else {
+      this.isLaserOn = false;
+    }
   },
 
   /**
