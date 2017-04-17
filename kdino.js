@@ -164,6 +164,7 @@ Runner.spriteDefinition = {
     HORIZON: {x: 2, y: 54},
     MOON: {x: 484, y: 2},
     PTERODACTYL: {x: 134, y: 2},
+    LASER_PROOF_PTERODACTYL: {x: 1246, y: 2},
     RESTART: {x: 2, y: 2},
     TEXT_SPRITE: {x: 655, y: 2},
     TREX: {x: 848, y: 2},
@@ -309,27 +310,27 @@ Runner.prototype = {
   loadSounds: function() {
     if (!IS_IOS) {
       this.audioContext = new AudioContext();
-      
+
       var resourceTemplate =
           document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content;
-      
+
       for (var sound in Runner.sounds) {
         var soundSrc =
             resourceTemplate.getElementById(Runner.sounds[sound]).src;
-        
+
         if (soundSrc.slice(0, 5) !== 'http') {
           soundSrc = window.location + soundSrc;
         }
-        
+
         var request = new XMLHttpRequest();
-        
+
         request.open('GET', soundSrc, true);
-        
+
         request.responseType = 'arraybuffer';
-        
+
         request.addEventListener('load', function() {
           var buffer = request.response;
-          
+
           this.audioContext.decodeAudioData(buffer, function(index, audioData) {
             this.soundFx[index] = audioData;
           }.bind(this, sound));
@@ -1533,6 +1534,26 @@ Obstacle.types = [
     numFrames: 2,
     frameRate: 1000/6,
     speedOffset: .8
+  },
+  {
+    type: 'LASER_PROOF_PTERODACTYL',
+    width: 46,
+    height: 40,
+    yPos: [ 100, 75, 50 ], // Variable height.
+    yPosMobile: [ 100, 50 ], // Variable height mobile.
+    multipleSpeed: 999,
+    minSpeed: 8.5,
+    minGap: 150,
+    collisionBoxes: [
+      new CollisionBox(15, 15, 16, 5),
+      new CollisionBox(18, 21, 24, 6),
+      new CollisionBox(2, 14, 4, 3),
+      new CollisionBox(6, 10, 4, 7),
+      new CollisionBox(10, 8, 6, 9)
+    ],
+    numFrames: 2,
+    frameRate: 1000/6,
+    speedOffset: .8
   }
 ];
 
@@ -1570,7 +1591,7 @@ function Trex(canvas, spritePos) {
   this.speedDrop = false;
   this.jumpCount = 0;
   this.jumpspotX = 0;
-  
+
   this.isLaserOn = false;
   this.laserEnergy = Trex.config.STARTING_LASER_ENERGY;
 
@@ -1788,7 +1809,7 @@ Trex.prototype = {
       this.canvasCtx.stroke();
       this.canvasCtx.closePath();
     }
-    
+
     // Draws laser energy meter.
     this.canvasCtx.fillStyle = '#585254';
     this.canvasCtx.fillRect(534, 30, 60, 8);
