@@ -1449,7 +1449,9 @@ Obstacle.prototype = {
   },
 
   isShotByLaser: function() {
-    if (this.typeConfig.type === 'PTERODACTYL') {
+    if (this.typeConfig.type.indexOf('LASER_PROOF') > -1) {
+      return false;
+    } else if (this.typeConfig.type === 'PTERODACTYL') {
       if (this.yPos === 50) {
         // High-flying pterodactyls are too high to be shot
         return false;
